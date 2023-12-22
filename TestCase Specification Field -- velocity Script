@@ -1,0 +1,42 @@
+/*
+  This velocity script code help us to display TestCase WorkItem In Polarion Report Page 
+   Condition1  -- If TestCase WorkItem Has heading WorkItem value In Specification customField
+   Condition2  -- We are Passing Heading Id In Url Parameter those value present In TestCase Specification Field
+   We display all TestCase WorkItem Details and I have added screenshot below 
+*/
+
+Testing Url: http://denbg0415vm.izd01.in/polarion/#/project/PistonAssembly/wiki/Specification_Field_WorkItem_Details?documentId=LastRevision&headingId=PA-2868
+
+##Below sql quey get all specified workItem In this project
+#set($projectId = $page.reference.projectId)
+#set($workItem="select WORKITEM.C_URI from WORKITEM inner join PROJECT on PROJECT.C_URI = WORKITEM.FK_URI_PROJECT where true and PROJECT.C_ID = '$projectId' and WORKITEM.C_TYPE = 'testcase' ")  
+#set($wi = $transaction.workItems.search.query("SQL:($workItem)"))
+
+
+#if(($urlParameters.get("documentId") !="null") &&( $urlParameters.get("headingId") !="null"))
+<table class="polarion-rpw-table-content">
+<tbody>
+<tr class="polarion-rpw-table-header-row">
+<th>Worltem</th>
+<th>Title</th>
+<th>Type</th>
+<th>Project Id</th>
+</tr>
+#foreach( $workItem in $wi)
+#set($wiObj = $workItem.getOldApi)
+#set($customField = $wiObj.getCustomField("specification"))
+#set($tesctCaseHasSpecification = $customField.getId)      ## If TestCase has Heading WorkItem In Specification Field
+#if($tesctCaseHasSpecification == $urlParameters.get("headingId"))
+<tr class="polarion-rpw-table-content-row polarion-sidebar-click-item">
+<td>$workItem.fields.id.render.withLinks</td>
+<td>$workItem.fields.title.render</td>
+<td>$workItem.fields.type.render</td>
+<td>$wiObj.getProjectId</td>
+#end
+#end
+</tr>
+</tbody>
+</table>
+#end
+
+        
