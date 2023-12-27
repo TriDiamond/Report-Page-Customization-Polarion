@@ -1,7 +1,6 @@
-##Below sql quey get all specified workItem In this project
-#set($projectId = $page.reference.projectId)
+##Below sql quey get all testcase workItem (Globally) which belongs specification field value has heading
 #set($heading = $urlParameters.get("headingId"))
-#set($workItem="select WORKITEM.C_URI from WORKITEM inner join PROJECT on PROJECT.C_URI = WORKITEM.FK_URI_PROJECT  inner join CF_WORKITEM CF1 on CF1.FK_WORKITEM = WORKITEM.C_PK where true and WORKITEM.C_TYPE = 'testcase' AND CF1.C_NAME = 'specification' AND CF1.C_STRING_VALUE='$heading' " )  
+#set($workItem="select WORKITEM.C_URI from WORKITEM inner join PROJECT on PROJECT.C_URI = WORKITEM.FK_URI_PROJECT inner join CF_WORKITEM CF1 on CF1.FK_WORKITEM = WORKITEM.C_PK where true and WORKITEM.C_TYPE = 'testcase' AND CF1.C_NAME = 'specification' AND CF1.C_STRING_VALUE='$heading' " )
 #set($wi = $transaction.workItems.search.query("SQL:($workItem)"))
 #if( $heading !="null")
 <table class="polarion-rpw-table-content">
@@ -24,5 +23,3 @@
 </tbody>
 </table>
 #end
-
-        
