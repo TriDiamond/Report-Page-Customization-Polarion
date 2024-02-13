@@ -1,0 +1,104 @@
+#set($projectId =$page.reference.projectId)
+#set($selectDocuments = $pageParameters.document.values())
+#set($approvedState  = "approved")
+#macro(renderLastApproved $document)
+#set($approvedDoc= false)
+#set($version = "")
+  #if(!$document.isUnresolvable())
+    #set($ds =  $trackerService.getDataService())
+    #foreach($c in $document.getWorkflowSignatures())
+       #if($c.transitionRevision &&$c.targetStatus.id.equals($approvedState))
+          #set($r  = $c.transitionRevision)
+          #set($approvedDoc =  $ds.getVersionedInstance($document.getUri(),$r))
+        #end
+     #end
+  #end
+   #if($approvedDoc)
+       #set($version =  $approvedDoc.getValue("version"))
+       #set($updatedDate = $approvedDoc.getUpdated())
+       #set($docUpdatedDate = $date.format('yyyy-MM-dd HH:mm', $updatedDate))
+       #set($spacePath = $approvedDoc.getModuleLocation().getLocationPath())
+       #set($spacePath = $spacePath.replace("_default/",""))
+      <a target="_top" href="/polarion/#/project/$approvedDoc.getProjectId()/wiki/$spacePath?revision=$r"><b>$version</b> </a> ($docUpdatedDate)
+  #end
+#end
+ 
+ 
+#if($selectDocuments.size == 0)
+  #warning("Please select documets")
+#else
+	<table class="polarion-rpw-table-content">
+  <tbody>
+     <tr class="polarion-rpw-table-header-row">
+     <th>Branched From</th>
+      <th>Document</th>
+       <th>Author</th>
+       <th>Current Version</th>
+       <th>Reuse Information</th>
+     </tr>
+    #foreach($document in $selectDocuments )
+         #set($doc = $document.getModelObject().getOldApi())
+          #set($colBranched = $doc.getBranchedModules())
+		  #set($reusedDocs = [])
+          ## Reused document 
+          #set($rootNode = $doc.getRootNode())
+          #set($childrens = $rootNode.getChildren())
+		  #foreach($child in $childrens) 
+          		#if($child.getWorkItem().getType().getId().equals("heading"))
+                   #set($headingWorkItem =  $child.getWorkItem())
+                    #set($headingLinkedWorkItems = $headingWorkItem.getLinkedWorkItemsBack())
+                     #foreach($linkedItem in $headingLinkedWorkItems) 
+                    		 #if( !$linkedItem.isUnresolvable() && $linkedItem.getType().getId().equals("heading"))
+                             	#if($linkedItem.getModule() != $doc)
+									 #set($workItmeModule  = $linkedItem.getModule())
+									  #if(!$reusedDocs.contains($workItmeModule))
+                                        #set($void = $reusedDocs.add($workItmeModule))
+                                     #end
+                                 #end
+                             #end
+                     #end
+                #end
+		  #end
+          #if($colBranched.size() > 0 || $reusedDocs.size() > 0)
+              #set($renderDoc = $transaction.documents.getBy.oldApiObject($doc))
+             <tr class="polarion-rpw-table-content-row">
+                <td> $!renderDoc.fields.branchedFrom.getIfCan.render.withLinks</td>
+                  <td >$renderDoc.render.withLinks</td>
+                   <td >$renderDoc.fields.author().render</td>
+                    <td >#renderLastApproved($doc) </td>
+                    <td>
+                      <table class="polarion-rpw-table-content">
+                      <tbody>
+                        <tr class="polarion-rpw-table-header-row">
+                            <th>Resued Version</th>
+                            <th>Reused Document</th>
+                             <th>Reused in Project</th>
+                            <th>Reused Document Author</th>                    
+                    </tr>
+                        #foreach($branchDoc in $colBranched)
+                          #set($renderBranchDoc = $transaction.documents.getBy.oldApiObject($branchDoc))
+                          <tr class="polarion-rpw-table-content-row">
+                             <td>#renderLastApproved($branchDoc.getBranchedFrom())</td>
+                             <td>$renderBranchDoc.render.withLinks</td>
+                             <td>$renderBranchDoc.fields.project().render.withLinks </td>
+                             <td>$renderBranchDoc.fields.author().render</td>
+                           </tr>
+                        #end
+                        #foreach($branchDoc in $reusedDocs)
+                          #set($renderBranchDoc = $transaction.documents.getBy.oldApiObject($branchDoc))
+                          <tr class="polarion-rpw-table-content-row">
+                             <td>#renderLastApproved($branchDoc.getBranchedFrom())</td>
+                             <td>$renderBranchDoc.render.withLinks</td>
+                             <td>$renderBranchDoc.fields.project().render.withLinks </td>
+                             <td>$renderBranchDoc.fields.author().render</td>
+                           </tr>
+                        #end
+                        </tbody>
+                        </table>
+                    <td>
+            </tr>
+      #end
+     #end
+    </tbody>
+  </table>
+#end
