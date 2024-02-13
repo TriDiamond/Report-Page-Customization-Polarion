@@ -1,0 +1,8 @@
+#set($query ="select DOC.C_URI from polarion.module DOC inner join polarion.project PRJ ON DOC.FK_Project = PRJ.C_PK where PRJ.c_id='$projectId' and DOC.c_id='Demo Document'  ")
+#set($document = $trackerService.getDataService().sqlSearch($query))
+
+#foreach($mod in $document)
+#set($renderDoc = $transaction.documents.getBy.oldApiObject($mod))
+$mod.getModuleName <br>
+$renderDoc.render.withLinks
+#end
