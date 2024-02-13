@@ -1,0 +1,1276 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+ 
+<style>
+	.div-col {
+    	display: inline-block;
+        width: 50%;
+    }
+    .pd-5 {
+    	padding: 5px;
+    }
+    .form-control {
+    	width: 100%;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: #1a1919bf;
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        width: 50%;
+        border-radius: 4px;
+      }
+      .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .modal-heading-div {
+        height: 48px;
+        cursor: move;
+        background-color: #005f87;
+        font-size: 18px;
+        color: #fff;
+        padding: 0px 5px;
+      }
+      .modal-heading-title {
+        padding-top: 12px;
+        font-weight: 600;
+      }
+      .modal-body {
+        /* height: 300px; */
+        background-color: #fff;
+        display: flex;
+        flex-direction: row;
+        padding: 10px;
+      }
+      .item-div {
+        width: 100%;
+      }
+      .item-shift-div {
+        width: 100px !important;
+        margin-left: 10px;
+        margin-right: 10px;
+        text-align: center;
+        padding-top: 95px;
+      }
+      .item-search-div {
+        border: 1px solid #C9C9C9;
+        font-size: 12px;
+        padding: 2px;
+      }
+      .item-search-icon {
+        width: 10%;
+        color: gray;
+      }
+      .item-search, .item-search:focus {
+        border: none !important;
+        width: 80%;
+        outline: none;
+      }
+      .item-list-div {
+        border: 1px solid #C9C9C9;
+        margin-top: 3px;
+        height: 200px;
+        overflow: auto;
+      }
+      .item-list-div > div{
+        padding: 3px 5px;
+        font-size: 13px;
+        cursor: default;
+      }
+      .item-list-div > div:hover, .selectedItem {
+        background-color: #CDE6EB;
+        cursor: default;
+      }
+      .move-icon-div {
+        width: 28px;
+        display: block;
+        margin: 5px auto;
+        text-align: center;
+        border-radius: 5px;
+        color: gray;
+        cursor: pointer;
+        border: 1px solid gray;
+      }
+      .move-icon {
+        font-size: 20px;
+      }
+      .submit-button, .cancel-button {
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-right: 8px;
+        padding: 10px 20px 10px 20px;
+        width: 90px;
+        color: white;
+        background-color: #005F87;
+        border: 1px solid #003750;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        border-radius: 2px;
+      }
+      .cancel-button {
+        color: #005F87;
+        background-color: #ffffff;
+        border: 1px solid #005F87;
+      }
+	.search-label{
+      font-weight:bold;
+      width:100%;
+      color:#888888;
+      font-size:11px;
+      margin-top:2px;
+      margin-bottom:6px
+    }
+    .main-search-label{
+        font-weight:bold;
+        width:100%;
+        color:black;
+        font-size:14px;
+        margin-bottom:8px !important;
+        margin-top:0px
+    }
+    .form-control{
+        width:100%;
+        max-width:100%;
+        padding:2px 4px;
+        border:1px solid #888888;
+        border-radius:2px;
+        margin-bottom:5px;
+        font-size:12px;
+    }
+    .btn-search{
+        min-width:80px;
+        border:1px solid #C1C1C1;
+        border-radius:8px;
+        background-color:gray;
+        font-weight:bold;
+        margin-top:5px;
+        margin-bottom:5px;
+        font-size:13px;
+        text-align:center;
+        padding: 10px 12px;
+        background: -webkit-gradient(linear, left top, left bottom, from(#F0F0F0), to(#D7D7D7));
+    }
+    .btn-search:hover {
+    	cursor: pointer
+    }
+    .search-content{
+        background-color: #EDEDED;
+        overflow: hidden;
+        padding: 5px;
+        margin-bottom: 3px;
+    }
+    .custom-heading {
+        margin: 0px !important;
+        margin-bottom: 3px !important;
+    }
+    .main-div{
+        border:1px solid #888888;
+        padding:5px;
+        width:100%
+    }
+    .main-report-div {
+    	width: 80%
+    }
+    .flex-div {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+	.left-div {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .right-div {
+    	float: left;
+        width: 50%
+    }
+    table.serge-table-1 {
+        border-collapse:collapse;
+        border:1px solid grey;
+    }
+  	tr.serge-th-1 th {
+        text-align:left;
+        padding:5px;
+        background-color:#f2f2f2;
+        border:1px solid grey;
+        text-align:center;
+   }
+   tr.serge-td-1 td {
+      text-align:left;
+      vertical-align:top;
+      border-top:1px solid grey;
+      border-right:1px solid grey; 
+  }
+  .pd-5 {
+    padding: 5px;
+  }
+  .custom-table {
+    border: 1px solid #e6e6e6;
+    overflow: hidden;
+    border-collapse: collapse !important;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  }
+  .custom-table tr {
+    border-bottom: 1px solid #e6e6e6 !important;
+  }
+  .custom-table td, .custom-table th {
+    padding: 5px;
+    border: 1px solid #e6e6e6 !important;
+  }
+  .custom-table tr:nth-child(odd) {
+    background-color: #aecee821;
+  }
+  .custom-table tr:nth-child(1), .custom-table td:nth-child(1) {
+    background-color: #005f87;
+    font-weight: normal;
+    color: #fff;
+    font-weight: bold;
+  }
+  .custom-table td:nth-child(1) {
+    font-weight: 500;
+  }
+  .custom-table tr:nth-child(odd) td:nth-child(1) {
+    ##background-color: #aecee840;
+  } 
+  .custom-table a {
+    color: #000000 !important;
+  }
+  p {
+      font-weight: bold;
+      color: #FF7F50;
+  }
+  .heading{
+      background-color:#F0F8FF;
+  }
+  .complaintGreen{
+      background-color:#CEF6CE;
+  }
+  .complaintRed{
+      background-color:#F6E3CE;
+  }
+  .complaintEmpty{
+      background-color:#F0E68C;
+  }
+  .checkbox-div, .availableField-div {
+      height: 200px;
+      overflow: auto;
+      padding: 15px;
+      background-color: #ffffff;
+      border:1px solid #888888;
+      border-radius:2px;
+      margin-top:2px;
+      margin-bottom: 5px;
+  }
+  .availableField-div {
+  		height: 100px;
+  }
+  .hidden-element {
+  	visibility:hidden
+  }
+  .ellipsis-text {
+    text-overflow: ellipsis !important;
+    width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .compare-checkbox {
+    position: relative;
+    top: 3px;
+    right: -2px;
+  }
+</style>
+
+#set($projectId=$page.reference.projectId)
+#set($q = '"')
+ 
+#macro(getAllAvailableDocTypes)
+        ##set($docTypeArray = [])
+        #set($docSr = 0)
+ 
+        #set($docType = $trackerService.getTrackerProject($projectId).getModuleTypeEnum().getAllOptions())
+ 
+        #set($availDocTypeArrayJSON = "")
+        #set($availDocTypeArrayJSON = "${availDocTypeArrayJSON}[" )
+ 
+        #foreach($_type in $docType) 
+            #set($docSr = $docSr + 1)
+            ##set($docMap = $objectFactory.newMap())
+            ##set($dummy = $docMap.put("tempId",$_type.id))
+            ##set($dummy = $docMap.put("docTypeName",$_type.getName()))
+            ##set($void = $docTypeArray.add($docMap))
+            #if($docType.size() == $docSr)
+                #set($fieldString = "{${q}tempId${q}:${q}$_type.id${q},${q}docTypeName${q}:${q}$_type.getName()${q}}")
+            #else
+                #set($fieldString = "{${q}tempId${q}:${q}$_type.id${q},${q}docTypeName${q}:${q}$_type.getName()${q}},")
+            #end
+ 
+            #set($availDocTypeArrayJSON = "${availDocTypeArrayJSON} ${fieldString}" )
+        #end
+ 
+        #set($availDocTypeArrayJSON = "${availDocTypeArrayJSON}]")
+ 
+        <script>
+            var _docTypeArray = '${availDocTypeArrayJSON}';
+            var availDocTypeArrayJSON = JSON.parse(_docTypeArray);
+        </script>
+        ##set($availDocTypeArray = $docTypeArray)
+#end
+ 
+#macro(getAllAvailableSpaces)
+        #set($spaceSr = 0)
+        #set($spaces = $trackerService.getFolderManager().getFolders($page.reference.projectId()))
+        #set($availSpacesArrayJSON = "")
+        #set($availSpacesArrayJSON = "${availSpacesArrayJSON}[" )
+ 
+        #foreach($_space in $spaces) 
+            #set($spaceSr = $spaceSr + 1)
+            #if($spaces.size() == $spaceSr)
+                #set($fieldString = "{${q}tempId${q}:${q}$_space.getName()${q},${q}spaceName${q}:${q}$_space.getName()${q}}")
+            #else
+                #set($fieldString = "{${q}tempId${q}:${q}$_space.getName()${q},${q}spaceName${q}:${q}$_space.getName()${q}},")
+            #end
+ 
+            #set($availSpacesArrayJSON = "${availSpacesArrayJSON} ${fieldString}" )
+        #end
+ 
+        #set($availSpacesArrayJSON = "${availSpacesArrayJSON}]")
+        <script>
+            var _spacesArray = '${availSpacesArrayJSON}';
+            var availSpacesArrayJSON = JSON.parse(_spacesArray);
+        </script>            
+#end
+ 
+#macro(getAllAvailableProjectGroups)
+        #set($groupSr = 0)
+        #set($groups=$trackerService.projectsService.rootProjectGroup.containedGroups.get(0))
+        #set($groupContains = $groups.getSortedContainedGroups())
+        #set($availGroupsArrayJSON = "")
+        #set($availGroupsArrayJSON = "${availGroupsArrayJSON}[" )
+ 
+        #foreach($_group in $groupContains)
+            #set($groupSr = $groupSr + 1)
+            #if($groupContains.size() == $groupSr)
+                #set($fieldString = "{${q}tempId${q}:${q}$_group.name${q},${q}groupName${q}:${q}$_group.name${q}}")
+            #else
+                #set($fieldString = "{${q}tempId${q}:${q}$_group.name${q},${q}groupName${q}:${q}$_group.name${q}},")
+            #end
+            #set($availGroupsArrayJSON = "${availGroupsArrayJSON} ${fieldString}" )
+        #end
+ 
+        #set($availGroupsArrayJSON = "${availGroupsArrayJSON}]")
+        <script>
+            var _docGroupArray = '${availGroupsArrayJSON}';
+            var availGroupsArrayJSON = JSON.parse(_docGroupArray);
+        </script>            
+#end
+<div>
+	<div class="div-col">
+    	<div style="padding: 5px">
+             <div class="search-content">
+                 <div style="padding-right: 18px">
+                     <label class="search-label">Document Types</label>
+                     <div id="dpDocumentType">
+                         <input type="text" class="form-control" id="documentTypeCheckInput">
+                         <span class="polarion-Button-GridImpl-TextCell" onclick="openModel('documentType')">
+	                         <button class="gwt-Label">Select...</button>
+                         </span>
+ 
+                         #getAllAvailableDocTypes()
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+    <div class="div-col">
+    	<div style="padding: 5px">
+             <div class="search-content">
+                 <div style="padding-right: 18px">
+                     <label class="search-label">Spaces</label>
+                     <div id="dpSpace">
+                         <input type="text" class="form-control" id="spaceCheckInput">
+                         <span class="polarion-Button-GridImpl-TextCell" onclick="openModel('space')">
+	                         <button class="gwt-Label">Select...</button>
+                         </span>
+ 
+                         #getAllAvailableSpaces()
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+    <div class="div-col">
+    	<div style="padding: 5px">
+             <div class="search-content">
+                 <div style="padding-right: 18px">
+                     <label class="search-label">Project Group</label>
+                     <div id="dpProjectGroup">
+                         <input type="text" class="form-control" id="projectGroupCheckInput">
+                         <span class="polarion-Button-GridImpl-TextCell" onclick="openModel('projectGroup')">
+	                         <button class="gwt-Label">Select...</button>
+                         </span>
+ 
+                         #getAllAvailableProjectGroups()
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+    <div class="div-col">
+        <div style="padding: 5px">
+             <div class="search-content">
+                 <div style="padding-right: 18px">
+                     <label class="search-label">Date Range</label>
+                     <div>
+                        <select id="dateRange" class="form-control" onchange="getDates(this.value)">
+                            <option value="0">Select Custom Date</option>
+                            <option value="2">Last 3 Months</option>
+                            <option value="5">Last 6 Months</option>
+                            <option value="11" selected="true">Last 12 Months</option>
+                        </select>
+                    </div>
+                    <div id="dateRangeDiv">
+                        <div class="div-col">
+                            <input type="date" id="fromDate" class="form-control">
+                        </div>
+                        <div class="div-col">
+                            <input type="date" id="toDate" class="form-control">
+                        </div>
+                    </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+    <div class="div-col">
+    	<button onclick="setFilters()">Filter</button>
+    </div>
+</div>
+ 
+<h4>Document Reuse Data</h4>	
+<div class="center-div" style="width:80%">
+	<canvas id="wiTypeChart"></canvas>
+</div>
+ 
+<h4>Month Wise Reuse Data</h4>
+<div class="center-div" style="width:80%">
+	<canvas id="wiMonthChart"></canvas>
+</div>
+ 
+#set($tempDate = $date.toDate("EEE, dd MMM yyyy HH:mm:ss +SSSS",$date.toDate($date)))
+#set($tempShortDate = $date.format("yyyy-MM-dd",$tempDate))
+ 
+#set($toDateFilter = $tempShortDate)
+#set($fromDateFilter = $tempShortDate)
+#set($documentTypeFilter = $urlParameters.dpDocumentType)
+#set($documentSpaceFilter = $urlParameters.dpSpace)
+#set($toDateFilter = $urlParameters.toDate)
+#set($fromDateFilter = $urlParameters.fromDate)
+ 
+#set($dateObjFrom = $date.toDate('yyyy-MM-dd', $fromDateFilter))
+#set($calendarFrom = $date.toCalendar($dateObjFrom))
+ 
+#set($dateObjTo = $date.toDate('yyyy-MM-dd', $toDateFilter))
+#set($calendarTo = $date.toCalendar($dateObjTo))
+ 
+#set($documentTypeFilterArray = $documentTypeFilter.split(","))
+#set($documentSpaceFilterArray = $documentSpaceFilter.split(","))
+ 
+#set($projectId =$page.reference.projectId)
+#set($query ="select * from polarion.module DOC inner join polarion.project PRJ ON DOC.FK_Project = PRJ.C_PK where PRJ.c_id='$projectId'")
+#set($documets = $trackerService.getDataService().sqlSearch($query))
+ 
+#set($documentTitleJSON = "")
+#set($documentTitleJSON = "${documentTitleJSON}[")
+ 
+#set($monthWiseDataJSON = "")
+#set($monthWiseDataJSON = "${monthWiseDataJSON}[")
+ 
+<table class="polarion-rpw-table-content">
+	<tbody>
+		<tr class="polarion-rpw-table-header-row">
+        	<th>Document Details</th>
+             <th>Document Title</th>
+             <th>Number of Times Reuse</th>
+       </tr>
+        #set($dataArray = "")
+        #set($count = 0)
+        #foreach($doc in $documets)
+        	#set($count = $count + 1)
+ 
+##			#if($documets.size() == $count)
+##                #set($documentTitleJSON = "${documentTitleJSON}{${q}docId${q}:${q}$doc.getId()${q},${q}reuseCount${q}:${q}$doc.getBranchedModules().size()${q}}")
+##            #else
+##                #set($documentTitleJSON = "${documentTitleJSON}{${q}docId${q}:${q}$doc.getId()${q},${q}reuseCount${q}:${q}$doc.getBranchedModules().size()${q}},")
+##            #end
+                #set($colBranched = $doc.getBranchedModules())
+                #if($colBranched.size() > 0)
+                    #set($documentTitleArray = $documentTitleArray + $doc.getId())
+                    #set($renderDoc = $transaction.documents.getBy.oldApiObject($doc))
+                    <tr class="polarion-rpw-table-content-row">               
+                      	 	#set($reusedCountAfterFilter = 0)
+                            <td>
+                            <table>
+                            #foreach($branchDoc in $colBranched)
+                                 #set($typeFilter = false)
+                                 #set($spaceFilter = false)
+                                 #set($dateFilter = false)
+                                 #foreach($type in $documentTypeFilterArray)
+                                      #if(($branchDoc.getType().id == $type) || $type == "all")
+                                          #set($typeFilter = true)
+                                      #end
+                                  #end
+ 
+                                 #foreach($space in $documentSpaceFilterArray)
+                                      #if(($branchDoc.getModuleFolder == $space) || $space == "all")
+                                          #set($spaceFilter = true)
+                                      #end
+                                  #end
+                                  #set($tempDocDate = $date.toDate("EEE, dd MMM yyyy HH:mm:ss +SSSS",$branchDoc.getCreated()))
+								  #set($shortDocDate = $date.format("yyyy-MM-dd",$tempDocDate))
+                                  #set($dateObjCurrent = $date.toDate('yyyy-MM-dd', $shortDocDate))
+                                  #set($calendarCurrent = $date.toCalendar($dateObjCurrent))
+ 
+                                  #set($calCompareFrom=$calendarFrom.compareTo($calendarCurrent))
+                                  #set($calCompareTo=$calendarCurrent.compareTo($calendarTo))
+                                  #if($calCompareFrom <= 0 && $calCompareTo <= 0)
+                                 		#set($dateFilter = true)
+                                  #end
+ 
+                                  #if($typeFilter == true && $spaceFilter == true && $dateFilter == true)
+                                  		#set($reusedCountAfterFilter = $reusedCountAfterFilter + 1)
+                                        #set($docMonth = $date.format("MMM",$tempDocDate))
+                                        #set($monthWiseDataJSON = "${monthWiseDataJSON}${q}$docMonth${q},")
+                                        <tr>
+                                        <td>$branchDoc.getId()</td>
+                                        ##<td>$shortDocDate</td>
+                                        <td>
+                                        	$tempDocDate.getMonth()
+                                        </td>
+                                        </tr>
+                                  #end
+                            #end  
+                            </table>
+                            </td>
+                            #if($reusedCountAfterFilter > 0)
+                                  <td>$renderDoc.render.withLinks</td>
+                                  <td>$reusedCountAfterFilter</td>
+                            #end
+                            #set($documentTitleJSON = "${documentTitleJSON}{${q}docId${q}:${q}$doc.getId()${q},${q}reuseCount${q}:${q}$reusedCountAfterFilter${q}},")
+                    </tr>
+                #end            
+        #end
+        #set($documentTitleJSON = "${documentTitleJSON}{${q}docId${q}:${q}${q},${q}reuseCount${q}:${q}0${q}}")
+        #set($documentTitleJSON = "${documentTitleJSON}]")
+        #set($monthWiseDataJSON = "${monthWiseDataJSON}${q}${q}")
+        #set($monthWiseDataJSON = "${monthWiseDataJSON}]")
+	</tbody>
+</table>
+ 
+	<div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-heading-div">
+            <div class="modal-heading-title">Select Items</div>
+            </div>
+            <div class="modal-body">
+                <div class="item-div">
+                    <span class="polarion-MultiValueSelector-label" style="font-size: 13px;">Available Items</span>
+                    <span id="availableSelectAllSpan" style="font-size: 13px; float: right">
+                        <input type="checkbox" id="selectAllAvailable" name="selectAllAvailable" onclick="checkAllAvailable()">
+                        <label for="selectAllAvailable" style="cursor: pointer">Select All</label>
+                    </span>
+                    <div style="margin-top: 3px;">
+                        <div class="item-search-div">
+                            <span class="item-search-icon">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </span>
+                            <input type="text" id="availableSearch" class="item-search" onkeyup="searchAvailableFields()" autocomplete="off">
+                            <span class="item-search-icon" style="padding-left: 20px">
+                                <i class="fa fa-times" style="cursor: pointer" onclick="clearInput('availableSearch')" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div id="availableItems" class="item-list-div">
+                            <!-- data from script -->
+                        </div>
+                    </div>
+                </div>
+                <div class="item-shift-div">
+                    <div class="move-icon-div" onclick="moveSelectedItemsToSelect()">
+                        <i class="fa fa-caret-right move-icon" aria-hidden="true"></i>
+                    </div>
+                    <div class="move-icon-div" onclick="moveSelectedItemsToAvailable()">
+                        <i class="fa fa-caret-left move-icon" aria-hidden="true"></i>
+                    </div>
+                </div>
+                <div class="item-div">
+                    <span class="polarion-MultiValueSelector-label" style="font-size: 13px;">Selected Items</span>
+                    <span class="" style="font-size: 13px; float: right">
+                        <input type="checkbox" id="selectAllSelected" name="selectAllSelected" onclick="checkAllSelected()">
+                        <label for="selectAllSelected" style="cursor: pointer">Select All</label>
+                    </span>
+                    <div style="margin-top: 3px;">
+                        <div class="item-search-div">
+                            <span class="item-search-icon">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </span>
+                            <input type="text" id="selectedSearch" class="item-search" onkeyup="searchSelectedFields()" autocomplete="off">
+                            <span class="item-search-icon" style="padding-left: 20px">
+                                <i class="fa fa-times" style="cursor: pointer" onclick="clearInput('selectedSearch')" aria-hidden="true"></i>
+                            </span>
+                        </div>
+                        <div id="selectedItems" class="item-list-div">
+                            <!-- data forom script -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 10px 10px 20px 10px;">
+                <button class="submit-button" onclick="setSubDocs()">OK</button>
+                <button class="cancel-button" onclick="closeModel()">Cancel</button>
+ 
+                <span id="docLengthWarningDiv" style="float: right; padding: 0; margin-top: -20px; margin-right: 8px;">
+                    <h6 style="color: #ff0000bf">You can select maximum 4 documents only.</h6>
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+	var reuseMonthsJSON = '${monthWiseDataJSON}';
+    var reuseMonthsArray = JSON.parse(reuseMonthsJSON);
+ 
+	var dataArrayJSON = '${documentTitleJSON}';
+	var dataArray = JSON.parse(dataArrayJSON);
+    var monthObj = {"Jan":0, "Feb":0, "Mar":0, "Apr":0, "May":0, "Jun":0, "Jul":0, "Aug":0, "Sep":0, "Oct":0, "Nov":0, "Dec":0};
+	var documentTitleArray = [];
+    var reuseCountArray = [];
+    var monthTitleArray = [];
+    var monthCountArray = [];
+    var bgColorsType = [];
+    var bgColorsMonths = [];
+    var colors = ["#2980b9", "#3498db", "#f1c40f", "#9b59b6", "#95a5a6", "#e74c3c", "#34495e", "#cfcfcf", "#95d55c", "#844883", "#ebf0f5", "#a74f00"];
+    var availableFieldArray = [];
+    var availableSpaceArray = [];
+    var availableProjectGroupArray = [];
+    var modal = document.getElementById("myModal");
+    var availableArray = [];
+    var selectedArray = [];
+    var selectedItem = {};
+    var checkedAvailableItemsArray = [];
+    var checkedSelectedItemsArray = [];
+    var availableDocTypeCheckTemp = [];
+    var selectedDocTypeCheckTemp = [];
+    var docTypeCheckStringValue = "";
+ 
+    var availableSpaceCheckTemp = [];
+    var selectedSpaceCheckTemp = [];
+    var spaceCheckStringValue = "";
+ 
+    var availableProjectGroupCheckTemp = [];
+    var selectedProjectGroupCheckTemp = [];
+    var projectGroupCheckStringValue = "";
+    var availableSearchArray = [];
+    var selectSearchArray = [];
+    var isAvailableSearch = false;
+    var isSelectedSearch = false;
+    var modelOpenFor = "";
+    var docTypeCheckArray = availDocTypeArrayJSON;
+    var spacesCheckArray = availSpacesArrayJSON;
+    var projectGroupsCheckArray = availGroupsArrayJSON;
+    for(var i=0; i<dataArray.length; i++) {
+    	if(dataArray[i].docId != "") {
+            documentTitleArray.push(dataArray[i].docId);
+            reuseCountArray.push(dataArray[i].reuseCount);
+            bgColorsType.push(colors[i]);
+        }
+    }
+    for(var i=0; i<reuseMonthsArray.length; i++) {
+    	if(reuseMonthsArray[i] != "") {
+            monthObj[reuseMonthsArray[i]] = monthObj[reuseMonthsArray[i]] + 1;
+            bgColorsMonths.push(colors[i]);
+        }
+    }
+    var monthTitleArray = Object.keys(monthObj);
+    var monthCountArray = Object.values(monthObj);
+    $(document).ready(function () {
+       hideShowDateRange();
+       setTimeout(loadTypeGraph, 1000);
+       setTimeout(loadMonthWiseDataGraph, 1000);
+    });
+	var url = window.location.href;
+	if (url.includes("?")) {
+        var paramValues = url.split("?").pop();
+        var keyValues = paramValues.split("&");
+        for (var x = 0; x < keyValues.length; x++) {
+            var currentPairData = keyValues[x].split("=");
+            document.getElementById(currentPairData[0]).value = decodeURIComponent(currentPairData[1]);
+ 
+            if(currentPairData[0] == "dpDocumentType") {
+                console.log("docType")
+                selectedDocTypeCheckTemp = [];
+                availableDocTypeCheckTemp = [];
+                var fieldCheckStringValue = "";
+ 
+                var docTypeArrayURL = decodeURIComponent(currentPairData[1]).split(',');
+                for(var j=0; j < docTypeArrayURL.length; j++){
+                    if(docTypeArrayURL[j] != "all") {
+                        availableFieldArray.push(docTypeArrayURL[j])
+                    }
+                }
+ 
+                for(var m = 0; m < docTypeCheckArray.length; m++) {
+                    if(availableFieldArray.includes(docTypeCheckArray[m].tempId)) {
+                        fieldCheckStringValue += docTypeCheckArray[m].docTypeName + ", ";
+                        selectedDocTypeCheckTemp.push(docTypeCheckArray[m])
+                    }
+                    else {
+                        availableDocTypeCheckTemp.push(docTypeCheckArray[m])
+                    }
+                }
+                document.getElementById("documentTypeCheckInput").value = fieldCheckStringValue;
+            }
+ 
+            if(currentPairData[0] == "dpSpace") {
+                console.log("space")
+                selectedSpaceCheckTemp = [];
+                availableSpaceCheckTemp = [];
+                var spaceStringValue = "";
+                var spaceArrayURL = decodeURIComponent(currentPairData[1]).split(',');
+                for(var j=0; j < spaceArrayURL.length; j++){
+                    if(spaceArrayURL[j] != "all") {
+                        availableSpaceArray.push(spaceArrayURL[j])
+                    }
+                }
+ 
+                for(var m = 0; m < spacesCheckArray.length; m++) {
+                    if(availableSpaceArray.includes(spacesCheckArray[m].tempId)) {
+                        spaceStringValue += spacesCheckArray[m].spaceName + ", ";
+                        selectedSpaceCheckTemp.push(spacesCheckArray[m])
+                    }
+                    else {
+                        availableSpaceCheckTemp.push(spacesCheckArray[m])
+                    }
+                }
+ 
+                document.getElementById("spaceCheckInput").value = spaceStringValue;
+            }
+ 
+            if(currentPairData[0] == "dpProjectGroup") {
+                console.log("project")
+                selectedProjectGroupCheckTemp = [];
+                availableProjectGroupCheckTemp = [];
+                var groupStringValue = "";
+                var projectGroupArrayURL = decodeURIComponent(currentPairData[1]).split(',');
+                for(var j=0; j < projectGroupArrayURL.length; j++){
+                    if(projectGroupArrayURL[j] != "all") {
+                        availableProjectGroupArray.push(projectGroupArrayURL[j])
+                    }
+                }
+ 
+                for(var m = 0; m < projectGroupsCheckArray.length; m++) {
+                    if(availableProjectGroupArray.includes(projectGroupsCheckArray[m].tempId)) {
+                        groupStringValue += projectGroupsCheckArray[m].groupName + ", ";
+                        selectedProjectGroupCheckTemp.push(projectGroupsCheckArray[m])
+                    }
+                    else {
+                        availableProjectGroupCheckTemp.push(projectGroupsCheckArray[m])
+                    }
+                }
+ 
+                document.getElementById("projectGroupCheckInput").value = groupStringValue;
+            }
+        }
+    }
+    else {
+    	setFilters();
+    }
+    function getDates(months) {
+    	hideShowDateRange();
+    	var today =  new Date().toJSON().slice(0, 10);
+        var diffDate = new Date(today);
+        var previousDate = new Date(diffDate.setMonth(diffDate.getMonth() - months));
+        var previousDateValue = new Date(previousDate).toJSON().slice(0, 10);
+        document.getElementById("toDate").value = today;
+        document.getElementById("fromDate").value = previousDateValue;
+    }
+	function setFilters_backup() {
+    	hideShowDateRange();
+    	var dpDocumentType = document.getElementById("dpDocumentType");
+        var dpSpace = document.getElementById("dpSpace");
+        var dpDateRange = document.getElementById("dateRange");
+        var toDate = document.getElementById("toDate");
+        var fromDate = document.getElementById("fromDate");
+        var documentTypes = (dpDocumentType.value != "") ? dpDocumentType.value : "all";
+        var documentSpaces = (dpSpace.value != "") ? dpSpace.value : "all";
+        var dateRange = (dpDateRange.value != "") ? dpDateRange.value : "12";
+        var currentURL = window.location.href;
+        var parameter = "";
+ 
+        if(currentURL.includes("?")) {
+        	currentURL = currentURL.substring(0, currentURL.indexOf("?"));
+        }
+        if(dateRange != "0") {
+        	getDates(dateRange);
+        }
+        currentURL = currentURL + "?dpDocumentType=" + documentTypes;
+        currentURL =  currentURL + "&dpSpace=" + documentSpaces;
+        currentURL =  currentURL + "&dateRange=" + dateRange;
+        currentURL =  currentURL + "&toDate=" + toDate.value;
+        currentURL =  currentURL + "&fromDate=" + fromDate.value;
+ 
+        window.location.href = currentURL;
+    }
+ 
+    function setFilters() {
+    	hideShowDateRange();
+        var dpDateRange = document.getElementById("dateRange");
+        var toDate = document.getElementById("toDate");
+        var fromDate = document.getElementById("fromDate");
+        var documentTypes = (availableFieldArray.length > 0) ? availableFieldArray.join(',') : "all";
+        var documentSpaces = (availableSpaceArray.length > 0) ? availableSpaceArray.join(',') : "all";
+        var projectGroup = (availableProjectGroupArray.length > 0) ? availableProjectGroupArray.join(',') : "all";
+        var dateRange = (dpDateRange.value != "") ? dpDateRange.value : "12";
+        var currentURL = window.location.href;
+        var parameter = "";
+ 
+        if(currentURL.includes("?")) {
+        	currentURL = currentURL.substring(0, currentURL.indexOf("?"));
+        }
+        if(dateRange != "0") {
+        	getDates(dateRange);
+        }
+        currentURL = currentURL + "?dpDocumentType=" + documentTypes;
+        currentURL =  currentURL + "&dpSpace=" + documentSpaces;
+        currentURL =  currentURL + "&dpProjectGroup=" + projectGroup;
+        currentURL =  currentURL + "&dateRange=" + dateRange;
+        currentURL =  currentURL + "&toDate=" + toDate.value;
+        currentURL =  currentURL + "&fromDate=" + fromDate.value;
+ 
+        window.location.href = currentURL;
+    }
+ 
+	function loadTypeGraph() {
+    	var docTypeBarChartData = {
+            datasets: [
+              {
+                data: reuseCountArray,
+                backgroundColor: bgColorsType,
+              },
+            ],
+            labels: documentTitleArray
+        };
+    	var canvas = document.getElementById("wiTypeChart");
+        var ctx = canvas.getContext("2d");
+        var myNewChart = new Chart(ctx, {
+          type: "bar",
+          data: docTypeBarChartData,
+          options: {
+                legend: {
+                    display: false
+                }
+            }
+        });
+    }
+    function loadMonthWiseDataGraph() {
+    	var monthWiseBarChartData = {
+            datasets: [
+              {
+                data: monthCountArray,
+                backgroundColor: bgColorsMonths,
+              },
+            ],
+            labels: monthTitleArray
+        };
+    	var canvas = document.getElementById("wiMonthChart");
+        var ctx = canvas.getContext("2d");
+        var myNewChart = new Chart(ctx, {
+          type: "bar",
+          data: monthWiseBarChartData,
+          options: {
+                legend: {
+                    display: false
+                }
+            }
+        });
+    }
+    function hideShowDateRange() {
+    	var dateRangeValue = document.getElementById("dateRange").value;
+        var dateRangeDivElement = document.getElementById("dateRangeDiv");
+        if(dateRangeValue != 0) {
+        	dateRangeDivElement.style.display = "none";
+        }
+        else {
+        	dateRangeDivElement.style.display = "block";
+        }
+    }
+    function openModel(openFor) {
+        modelOpenFor = openFor;
+        modelDataSetup();
+    }
+ 
+    function modelDataSetup() {
+        availableFieldArray = [];
+        if(modelOpenFor == "documentType") {
+            selectedDocTypeCheckTemp = [];
+            availableDocTypeCheckTemp = [];
+ 
+            var docTypeData = document.getElementById("documentTypeCheckInput").value.split(",");
+            if(docTypeData.length > 0) {
+                for(var n=0; n < docTypeCheckArray.length; n++) {
+                    for(var i=0; i < docTypeData.length; i++){
+                        if(docTypeData[i].trim() == docTypeCheckArray[n].docTypeName)
+                            availableFieldArray.push(docTypeCheckArray[n].tempId);
+                    }
+                }
+            }
+ 
+            for(var m = 0; m < docTypeCheckArray.length; m++) {
+                if(availableFieldArray.includes(docTypeCheckArray[m].tempId)) {
+                    selectedDocTypeCheckTemp.push(docTypeCheckArray[m])
+                }
+                else {
+                    availableDocTypeCheckTemp.push(docTypeCheckArray[m])
+                }
+            }
+ 
+            prepareModelData(availableDocTypeCheckTemp, selectedDocTypeCheckTemp);
+        }
+ 
+        if(modelOpenFor == "space") {
+            selectedSpaceCheckTemp = [];
+            availableSpaceCheckTemp = [];
+            var spaceData = document.getElementById("spaceCheckInput").value.split(",");
+            if(spaceData.length > 0) {
+                for(var n=0; n < spacesCheckArray.length; n++) {
+                    for(var i=0; i < spaceData.length; i++){
+                        if(spaceData[i].trim() == spacesCheckArray[n].spaceName)
+                            availableSpaceArray.push(spacesCheckArray[n].tempId);
+                    }
+                }
+            }
+ 
+            for(var m = 0; m < spacesCheckArray.length; m++) {
+                if(availableSpaceArray.includes(spacesCheckArray[m].tempId)) {
+                    selectedSpaceCheckTemp.push(spacesCheckArray[m])
+                }
+                else {
+                    availableSpaceCheckTemp.push(spacesCheckArray[m])
+                }
+            }
+ 
+            prepareModelData(availableSpaceCheckTemp, selectedSpaceCheckTemp);
+        }
+ 
+        if(modelOpenFor == "projectGroup") {
+            selectedProjectGroupCheckTemp = [];
+            availableProjectGroupCheckTemp = [];
+            var projectGroupData = document.getElementById("projectGroupCheckInput").value.split(",");
+            if(projectGroupData.length > 0) {
+                for(var n=0; n < projectGroupsCheckArray.length; n++) {
+                    for(var i=0; i < projectGroupData.length; i++){
+                        if(projectGroupData[i].trim() == projectGroupsCheckArray[n].groupName)
+                            availableProjectGroupArray.push(projectGroupsCheckArray[n].tempId);
+                    }
+                }
+            }
+ 
+            for(var m = 0; m < projectGroupsCheckArray.length; m++) {
+                if(availableProjectGroupArray.includes(projectGroupsCheckArray[m].tempId)) {
+                    selectedProjectGroupCheckTemp.push(projectGroupsCheckArray[m])
+                }
+                else {
+                    availableProjectGroupCheckTemp.push(projectGroupsCheckArray[m])
+                }
+            }
+ 
+            prepareModelData(availableProjectGroupCheckTemp, selectedProjectGroupCheckTemp);
+        }
+        modal.style.display = "block";
+    }
+    function prepareModelData(availableArr, selectedArr) {
+        if(modelOpenFor == "document") {
+            availableArray = (availableArr.length == 0 && selectedArr.length == 0) ? subDocumentArray : availableArr;
+        }
+        if(modelOpenFor == "documentType") {
+            availableArray = (availableArr.length == 0 && selectedArr.length == 0) ? docTypeCheckArray : availableArr;
+        }
+        if(modelOpenFor == "space") {
+            availableArray = (availableArr.length == 0 && selectedArr.length == 0) ? spacesCheckArray : availableArr;
+        }
+        if(modelOpenFor == "projectGroup") {
+            availableArray = (availableArr.length == 0 && selectedArr.length == 0) ? projectGroupsCheckArray : availableArr;
+        }
+        selectedArray = selectedArr;
+        loadAvailableDocData(availableArray);
+        loadSelectedDocData(selectedArray);
+    }
+    function loadAvailableDocData(_availableDataArray) {
+        var availableDivData = "";
+        var key = "tempId";
+        for (var i = 0; i < _availableDataArray.length; i++) {
+            availableDivData += "<div id='avlilableItem_"+ i +"' onclick='addAvailableSelection("+ i +")' ondblclick='moveToSelected("+ i +")'>" + _availableDataArray[i][key] + "</div>";
+        }
+        document.getElementById("availableItems").innerHTML = (availableDivData.length > 0) ? availableDivData : "<span style='display: block; width: 100%; padding-top: 10px; text-align: center'>No records found</span>";
+    }
+ 
+    function loadSelectedDocData(_selectedDataArray) {
+        var selectedDivData = "";
+        var key = "tempId";
+        for (var i = 0; i < _selectedDataArray.length; i++) {
+            selectedDivData += "<div id='selectItem_"+ i +"' onclick='addSelectedSelection("+ i +")' ondblclick='moveToAvailable("+ i +")'>" + _selectedDataArray[i][key] + "</div>";
+        }
+        document.getElementById("selectedItems").innerHTML = (selectedDivData.length > 0) ? selectedDivData : "<span style='display: block; width: 100%; padding-top: 10px; text-align: center'>No records found</span>";
+    }
+    function searchAvailableFields() {
+        //manageSelectAllAvailableFields();
+ 
+        availableSearchArray = [];
+        var inputValue = document.getElementById("availableSearch").value;
+        var key ="tempId";
+        if(inputValue.length > 0) {
+            isAvailableSearch = true;
+            for(var i=0; i<availableArray.length; i++) {
+                if(availableArray[i][key].toLowerCase().includes(inputValue.toLowerCase())) {
+                    availableSearchArray.push(availableArray[i])
+                }
+            }
+        }
+        else {
+            isAvailableSearch = false;
+            availableSearchArray = availableArray;
+        }
+ 
+        loadAvailableDocData(availableSearchArray)
+    }
+    function searchSelectedFields() {
+        //manageSelectAllSelectedFields();
+ 
+        selectSearchArray = [];
+        var inputValue = document.getElementById("selectedSearch").value;
+        var key = "tempId";
+        if(inputValue.length > 0) {
+            isSelectedSearch = true;
+            for(var i=0; i<selectedArray.length; i++) {
+                if(selectedArray[i][key].toLowerCase().includes(inputValue.toLowerCase())) {
+                    selectSearchArray.push(selectedArray[i])
+                }
+            }
+        }
+        else {
+            isSelectedSearch = false;
+            selectSearchArray = selectedArray;
+        }
+ 
+        loadSelectedDocData(selectSearchArray)
+    }
+    function clearInput(element) {
+        document.getElementById(element).value = "";
+ 
+        if(element == "availableSearch") {
+            isAvailableSearch = false;
+            loadAvailableDocData(availableArray);
+            checkedAvailableItemsArray = [];
+        }
+        else {
+            isSelectedSearch = false;
+            loadSelectedDocData(selectedArray);
+            checkedSelectedItemsArray = [];
+        }
+    }
+    function moveSelectedItemsToSelect() {
+        if(checkedAvailableItemsArray.length > 0) {
+            var sortedArray = sortArray(checkedAvailableItemsArray);
+            for(var i=0; i<sortedArray.length; i++) {
+                moveToSelected(sortedArray[i])
+            }
+ 
+            //document.getElementById("selectAllAvailable").checked = false;
+            removeClassList();
+        }
+    }
+    function moveSelectedItemsToAvailable() {
+        if(checkedSelectedItemsArray.length > 0) {
+            var sortedArray = sortArray(checkedSelectedItemsArray);
+            for(var i=0; i<sortedArray.length; i++) {
+                moveToAvailable(sortedArray[i])
+            }
+ 
+            //document.getElementById("selectAllSelected").checked = false;
+            removeClassList();
+        }
+    }
+    function removeClassList() {
+        checkedSelectedItemsArray = [];
+        checkedAvailableItemsArray = [];
+        var elements = document.getElementsByClassName("selectedItem");
+        if(elements.length > 0) {
+            for(var i=0; i<elements.length; i++) {
+                elements[i].classList.remove("selectedItem");
+            }
+        }
+    }
+    function closeModel() {
+    	modal.style.display = "none";
+    }
+    function addAvailableSelection(index) {
+        var arrayIndex = checkedAvailableItemsArray.indexOf(index);
+        if(arrayIndex > -1) {
+            checkedAvailableItemsArray.splice(arrayIndex, 1);
+            document.getElementById("avlilableItem_"+index).classList.remove("selectedItem");
+        }
+        else {
+            checkedAvailableItemsArray.push(index);
+            document.getElementById("avlilableItem_"+index).classList.add("selectedItem");
+        }
+    }
+    function addSelectedSelection(index) {
+        var arrayIndex = checkedSelectedItemsArray.indexOf(index);
+        if(arrayIndex > -1) {
+            checkedSelectedItemsArray.splice(arrayIndex, 1);
+            document.getElementById("selectItem_"+index).classList.remove("selectedItem");
+        }
+        else {
+            checkedSelectedItemsArray.push(index);
+            document.getElementById("selectItem_"+index).classList.add("selectedItem");
+        }
+ 
+    }
+    function moveToSelected(index) {
+        checkedAvailableItemsArray = [];
+ 
+        isSelectedSearch = false;
+        document.getElementById("selectedSearch").value = "";
+        if(isAvailableSearch) {
+            var key = "tempId";
+            selectedArray.push(availableSearchArray[index]);
+            for(var i=0; i<availableArray.length; i++) {
+                if(availableSearchArray[index][key] == availableArray[i][key]) {
+                    availableArray.splice(i, 1);
+                }
+            }
+            availableSearchArray.splice(index, 1);
+            loadAvailableDocData(availableSearchArray);
+            loadSelectedDocData(selectedArray);
+        }
+        else {
+            selectedArray.push(availableArray[index]);
+            availableArray.splice(index, 1);
+            loadAvailableDocData(availableArray);
+            loadSelectedDocData(selectedArray);
+        }
+    }
+    function moveToAvailable(index) {
+        isAvailableSearch = false;
+        document.getElementById("availableSearch").value = "";
+        var _selectedDataArray = (isSelectedSearch) ? selectSearchArray : selectedArray;
+ 
+        if(modelOpenFor == "document") {
+            var itemIndex = subDocArray.indexOf(_selectedDataArray[index].tempId);
+            subDocArray.splice(itemIndex, 1);
+        }
+ 
+        if(modelOpenFor == "documentType") {
+            var itemIndex = availableFieldArray.indexOf(_selectedDataArray[index].tempId);
+            availableFieldArray.splice(itemIndex, 1);
+        }
+        if(modelOpenFor == "space") {
+            var itemIndex = availableSpaceArray.indexOf(_selectedDataArray[index].tempId);
+            availableSpaceArray.splice(itemIndex, 1);
+        }
+        if(modelOpenFor == "projectGroup") {
+            var itemIndex = availableProjectGroupArray.indexOf(_selectedDataArray[index].tempId);
+            availableProjectGroupArray.splice(itemIndex, 1);
+        }
+        if(isSelectedSearch) {
+            var key ="tempId";
+            availableArray.push(selectSearchArray[index]);
+            for(var i=0; i<selectedArray.length; i++) {
+                if(selectSearchArray[index][key] == selectedArray[i][key]) {
+                    selectedArray.splice(i, 1);
+                }
+            }
+            selectSearchArray.splice(index, 1);
+            loadAvailableDocData(availableArray);
+            loadSelectedDocData(selectSearchArray);
+ 
+        }
+        else {
+            availableArray.push(selectedArray[index]);
+            selectedArray.splice(index, 1);
+ 
+            loadAvailableDocData(availableArray);
+            loadSelectedDocData(selectedArray);
+        }
+ 
+    }
+    function sortArray(_array) {
+        var isSort = false;
+        while (!isSort) {
+            isSort = true;
+            for (let i = 0; i < _array.length; i++) {
+                if (_array[i] > _array[i - 1]) {
+                    isSort = false;
+                    let temp = _array[i];
+                    _array[i] = _array[i - 1];
+                    _array[i - 1] = temp;
+                }
+            }
+        }
+ 
+        return _array;
+    }
+    function setSubDocs() {
+        if(modelOpenFor == "documentType") {
+            var fieldCheckString = "";
+            for (var i = 0; i < selectedArray.length; i++) {
+                if(!availableFieldArray.includes(selectedArray[i].tempId)) {
+                    availableFieldArray.push(selectedArray[i].tempId);
+                }
+                fieldCheckString += selectedArray[i].docTypeName + ", ";
+            }
+            document.getElementById("documentTypeCheckInput").value = fieldCheckString;
+        }
+        if(modelOpenFor == "space") {
+            var spaceCheckString = "";
+            for (var i = 0; i < selectedArray.length; i++) {
+                if(!availableSpaceArray.includes(selectedArray[i].tempId)) {
+                    availableSpaceArray.push(selectedArray[i].tempId);
+                }
+                spaceCheckString += selectedArray[i].spaceName + ", ";
+            }
+            document.getElementById("spaceCheckInput").value = spaceCheckString;
+        }
+        if(modelOpenFor == "projectGroup") {
+            var projectGroupCheckString = "";
+            for (var i = 0; i < selectedArray.length; i++) {
+                if(!availableProjectGroupArray.includes(selectedArray[i].tempId)) {
+                    availableProjectGroupArray.push(selectedArray[i].tempId);
+                }
+                projectGroupCheckString += selectedArray[i].groupName + ", ";
+            }
+            document.getElementById("projectGroupCheckInput").value = projectGroupCheckString;
+        }
+ 
+        //setFilters();
+        closeModel();
+    }
+</script>
