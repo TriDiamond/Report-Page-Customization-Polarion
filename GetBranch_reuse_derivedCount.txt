@@ -1,0 +1,102 @@
+#set($projectId =$page.reference.projectId)
+
+ #set($projectId =$page.reference.projectId)
+#set($query ="select * from polarion.module DOC inner join polarion.project PRJ ON DOC.FK_Project = PRJ.C_PK where PRJ.c_id='$projectId'")
+#set($documents = $trackerService.getDataService().sqlSearch($query))
+
+#if($documents.size > 0)
+<table class="polarion-rpw-table-content">
+  <tbody>
+     <tr class="polarion-rpw-table-header-row">
+      <th>Document</th>
+       <th>Reused Count</th>
+    </tr>
+
+ #set($derivedDocCount =0)
+ #set($branchedDocCount =0)
+ #set($reusedDoc =[])
+  #set($emptyReusedDoc =0)
+ #set($reusedParentDocument = [])
+  #set($testElementDocument = [])
+
+##To get Reuse Document and store in $reusedDoc
+
+#foreach($doc in $documents)
+
+ #foreach($wi in $doc.getAllowedWITypes())
+      #if($wi.getId() == "testElement")
+           #set($void = $testElementDocument.add($doc))
+#end
+#end
+
+
+#set($rootNode = $doc.getRootNode())
+#set($childrens = $rootNode.getChildren)
+
+
+## Here getting reusedDoc object added to reusedDoc array
+#foreach($child in $childrens) 
+#if($child.getWorkItem().getType().getId().equals("heading"))  
+                 #set($headingWorkItem =  $child.getWorkItem())
+                 #set($headingLinkedWorkItems = $headingWorkItem.getLinkedWorkItemsBack())
+ #foreach($linkedItem in $headingLinkedWorkItems) 
+ #if( !$linkedItem.isUnresolvable() && $linkedItem.getType().getId().equals("heading"))
+#if($linkedItem.getModule() != $doc &&  $doc.getDerivedModules.size == 0 )
+         #set($void = $reusedParentDocument.add($doc))
+	      #set($workItemModule  = $linkedItem.getModule())
+#if(!$reusedDocs.contains($workItemModule))
+           #set($void = $reusedDoc.add($workItemModule))
+                    #end
+                #end
+            #end
+      #end
+   #end
+#end
+          
+        
+ #set($derivedDocument = $doc.getDerivedModules())
+ #set($branchedDocument = $doc.getBranchedModules())
+ 
+#if($derivedDocument.size >0 ||  $branchedDocument.size >0 )
+
+##Here getting derived Module count and add derived Module obj to Reused ParentDoc array
+#foreach($derivedDoc  in $derivedDocument)
+   #if(!$reusedParentDocument.contains($doc))
+    #set($void = $reusedParentDocument.add($doc))
+            #end
+   #set($derivedDocCount = $derivedDocCount+1)
+ #end
+  
+ ##Here getting branched Module count and add branched Module obj to Reused ParentDoc array
+#foreach($branchedDoc  in $branchedDocument)
+#if(!$reusedParentDocument.contains($doc))
+      #set($void = $reusedParentDocument.add($doc))
+             #end
+    #set($branchedDocCount = $branchedDocCount+1)
+#end
+ #end
+ #end           
+
+        
+ #foreach($parentDoc in $reusedParentDocument)
+  #if(!$testElementDocument.contains($parentDoc) || ($testElementDocument.isEmpty()))
+     <tr class="polarion-rpw-table-content-row">
+ #set($renderDoc = $transaction.documents.getBy.oldApiObject($parentDoc))
+      <td>$renderDoc.render.withLinks</td>
+       #if($parentDoc.getDerivedModules.size == 0 && $parentDoc.getBranchedModules.size() ==0 )
+       <td>$reusedDoc.size</td>                                              ##Here get reusedDoc.size   & Parent Doc 
+       #elseif($parentDoc.getBranchedModules.size != 0)
+       <td>$parentDoc.getBranchedModules.size()</td>          ##Here get BranchedModule.size   & Parent Doc 
+         #elseif($parentDoc.getDerivedModules.size  != 0)
+       <td>$parentDoc.getDerivedModules.size </td>			 ##Here get getDerivedModules.size   & Parent Doc			
+ 		#else
+       <td>$emptyReusedDoc</td>
+       #end
+     </tr>
+  #end
+  #end
+
+ #end
+  </tbody>
+ </table>
+        
