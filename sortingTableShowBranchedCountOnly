@@ -1,0 +1,130 @@
+<style>
+#myTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#myTable th {
+  cursor: pointer;
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+  padding: 8px;
+  text-align: left;
+}
+
+#myTable th:hover {
+  background-color: #ddd;
+}
+
+.arrow-class  {
+display: none;
+font-size: 1.5em;"
+}
+th:hover #arrowIcon {
+  display: inline; 
+}
+
+</style>
+          
+          #set($projectId =$page.reference.projectId)
+#set($query ="select * from polarion.module DOC inner join polarion.project PRJ ON DOC.FK_Project = PRJ.C_PK where PRJ.c_id='$projectId'")
+#set($documents = $trackerService.getDataService().sqlSearch($query))
+#if($documents.size > 0)
+<table id="myTable" class="polarion-rpw-table-content">
+  <tbody class=".polarion-rpw-table-content tbody">
+     <tr class="polarion-rpw-table-header-row">
+      <th>Document</th>
+       <th onclick="sortTable()" >Reused Count <span id="arrowIcon" class="arrow-class" >▼</span></th>
+  </tr>
+#set($reusedParentDocument = [])
+#set($testElementDocument = [])
+#foreach($doc in $documents)
+##To get TestElement embedded Document
+#foreach($wi in $doc.getAllowedWITypes())
+  #if($wi.getId() == "testElement")
+   #set($void = $testElementDocument.add($doc))
+#end
+#end
+##Added Branched Module in reusedParentDocument
+#set($branchedDocument = $doc.getBranchedModules())
+#if($branchedDocument.size >0 )
+ #foreach($branchedDoc  in $branchedDocument)
+#if(!$reusedParentDocument.contains($doc))
+          #set($void = $reusedParentDocument.add($doc))
+   #end
+        #set($branchedDocCount = $branchedDocCount+1)
+  #end
+ #end
+#end
+#foreach($parentDoc in $reusedParentDocument)
+  #if(!$testElementDocument.contains($parentDoc) || ($testElementDocument.isEmpty()))
+                   <tr class="polarion-rpw-table-content-row">
+#set($renderDoc = $transaction.documents.getBy.oldApiObject($parentDoc))
+        <td>$renderDoc.render.withLinks</td>
+        <td>$parentDoc.getBranchedModules.size</td>
+     </tr>
+  #end
+  #end
+  #end
+</tbody>
+</table>
+<script>
+
+var sortingOrder = 'asc';
+function sortTable() {
+console.log("Its working");
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.getElementById("myTable");
+    switching = true;
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        shouldSwitch = false;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("td")[1]; // Second column index is 1
+            y = rows[i + 1].getElementsByTagName("td")[1]; // Second column index is 1
+            var xValue = parseInt(x.textContent.trim());
+            var yValue = parseInt(y.textContent.trim());
+
+            if (sortingOrder === 'desc') {
+            console.log("xvalue", typeof(xValue))
+                if (xValue < yValue) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else {
+                if (xValue > yValue) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+    // Toggle sorting order
+  // 
+    updateArrowIcon();
+    
+}
+
+function updateArrowIcon() {
+
+    var arrowIcon = document.getElementById("arrowIcon");
+    if (sortingOrder === 'desc') {
+        arrowIcon.innerHTML = '▼'; // Downward arrow
+    } else {
+        arrowIcon.innerHTML = '▲'; // Upward arrow
+    }
+    arrowIcon.style.display = 'inline'; // Show the arrow icon
+    sortingOrder = (sortingOrder === 'desc') ? 'asc' : 'desc';
+}
+
+
+</script>
+        
